@@ -47,10 +47,8 @@ fn count_sliding_increases(input: &[i32]) -> i32 {
 
 fn main() {
     let test_input = get_vector("src/test_input_part1.txt");
-    println!("Test Input: {:?}", test_input);
     println!("Test Result: {}", count_increases(&test_input));
 
     let real_input = get_vector("src/puzzle_input_part1.txt");
-    println!("Test Input: {:?}", real_input);
     println!("Test Result: {}", count_increases(&real_input));
 }

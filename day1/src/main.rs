@@ -33,22 +33,37 @@ fn count_increases(input: &[i32]) -> i32 {
 }
 
 fn count_sliding_increases(input: &[i32]) -> i32 {
-    let mut last_value = input[0];
     let mut _count = 0;
-    for &value in input {
-        if value > last_value {
+
+    for i in 3..input.len() {
+        let current_start = i - 2;
+        let current_end = i + 1;
+        let current_triplet: i32 = input[current_start..current_end].iter().sum();
+
+        let last_start = current_start - 1;
+        let last_end = current_end - 1;
+        let last_triplet: i32 = input[last_start..last_end].iter().sum();
+
+        if current_triplet > last_triplet {
             _count += 1;
         }
-        last_value = value;
     }
 
     return _count;
 }
 
 fn main() {
-    let test_input = get_vector("src/test_input_part1.txt");
-    println!("Test Result: {}", count_increases(&test_input));
+    // part 1
+    let input = get_vector("src/test_input.txt");
+    println!("Test Result: {}", count_increases(&input));
 
-    let real_input = get_vector("src/puzzle_input_part1.txt");
-    println!("Test Result: {}", count_increases(&real_input));
+    let input = get_vector("src/puzzle_input.txt");
+    println!("Test Result: {}", count_increases(&input));
+
+    // part 2
+    let input = get_vector("src/test_input.txt");
+    println!("Test Result: {}", count_sliding_increases(&input));
+
+    let input = get_vector("src/puzzle_input.txt");
+    println!("Test Result: {}", count_sliding_increases(&input));
 }

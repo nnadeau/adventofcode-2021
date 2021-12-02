@@ -32,6 +32,19 @@ fn count_increases(input: &[i32]) -> i32 {
     return _count;
 }
 
+fn count_sliding_increases(input: &[i32]) -> i32 {
+    let mut last_value = input[0];
+    let mut _count = 0;
+    for &value in input {
+        if value > last_value {
+            _count += 1;
+        }
+        last_value = value;
+    }
+
+    return _count;
+}
+
 fn main() {
     let test_input = get_vector("src/test_input_part1.txt");
     println!("Test Input: {:?}", test_input);

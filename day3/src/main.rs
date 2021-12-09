@@ -70,9 +70,65 @@ fn get_epsilon_rate(gamma_rate: &usize, nbits: &usize) -> usize {
     return epsilon_rate;
 }
 
-fn get_oxygen_generator_rating(matrix: Array2<usize>) {}
+fn get_life_support_rating_metrics(
+    numbers: &Vec<usize>,
+    nbits: usize,
+    is_most_common: bool,
+) -> usize {
+    let mut current_numbers: Vec<usize> = numbers.clone();
+    for i in (0..nbits).rev() {
+        // println!("{}", "~".repeat(10));
+        // println!("Iteration {}", i);
+        // for g in &current_numbers {
+        //     println!("{:#07b}\t{}", g, g);
+        // }
 
-fn calculate_power_consumption(input: &str) {
+        // find threshold of "most common"
+        let count_threshold = (current_numbers.len() + 1) / 2;
+        // println!("Count : {}", current_numbers.len());
+        // println!("Threshold: {}", count_threshold);
+
+        // find count of 1 in column
+        let ones_count = current_numbers
+            .iter()
+            .filter(|x| check_bit_for_one(x, i))
+            .count();
+
+        // check if 1 is most common
+        // println!("ones_count: {}", ones_count);
+        let is_ones_common = ones_count >= count_threshold;
+
+        // println!("is_ones_common: {}", is_ones_common);
+
+        // split current_numbers into two groups, keeping common
+        let (new_numbers_true, new_numbers_false): (Vec<usize>, Vec<usize>) = current_numbers
+            .iter()
+            .partition(|x| check_bit_for_one(x, i) == is_ones_common);
+
+        // replace current_numbers
+        if is_most_common {
+            current_numbers = new_numbers_true;
+        } else {
+            current_numbers = new_numbers_false;
+        }
+
+        // break if one left
+        if current_numbers.len() <= 1 {
+            break;
+        }
+    }
+    return *current_numbers.last().unwrap();
+}
+
+fn check_bit_for_one(number: &usize, bit_idx: usize) -> bool {
+    let mask = 1 << bit_idx;
+    let masked_value = *number & mask;
+    let is_bit_valid = masked_value > 0;
+
+    return is_bit_valid;
+}
+
+fn calculate_puzzle(input: &str) {
     let contents = parse_input(input);
     let matrix = contents_to_matrix(&contents);
 
@@ -86,16 +142,28 @@ fn calculate_power_consumption(input: &str) {
     println!("Power Consumption: {}", power_consumption);
 
     // part 2
-    let oxygen_generator_rating = 0;
-    let co2_scrubber_rating = 0;
-    let life_support_rating = co2_scrubber_rating * oxygen_generator_rating;
+    let nbits = contents.lines().last().unwrap().len();
+    let numbers = contents
+        .lines()
+        .map(|x| usize::from_str_radix(x, 2).unwrap())
+        .collect::<Vec<_>>();
+
+    let oxygen_rating = get_life_support_rating_metrics(&numbers, nbits, true);
+    println!("Oxygen Generator Rating: {}", oxygen_rating);
+
+    let co2_scrubber_rating = get_life_support_rating_metrics(&numbers, nbits, false);
+    println!("CO2 Scrubber Rating: {}", co2_scrubber_rating);
+
+    let life_support_rating = co2_scrubber_rating * oxygen_rating;
     println!("Life Support Rating: {}", life_support_rating);
 }
 
 fn main() {
     println!("Test Input...");
-    calculate_power_consumption("src/test_input.txt");
+    calculate_puzzle("src/test_input.txt");
+
+    println!("{}", "~".repeat(50));
 
     println!("Puzzle Input...");
-    calculate_power_consumption("src/puzzle_input.txt");
+    calculate_puzzle("src/puzzle_input.txt");
 }
